@@ -2,13 +2,14 @@ import requests
 from bs4 import BeautifulSoup
 
 class nexushd_scraper:
-    def __init__(self,cookie):
+    def __init__(self,cookie = None):
         self.cookie = cookie
         self.url = 'http://nexushd.org/'
     
     def search(self,name):
+        if self.cookie == None:
+            return None
         raw_data = self.search_raw(name)
-        print(len(raw_data))
         data = []
         id = 0
         for i in raw_data:
@@ -23,6 +24,7 @@ class nexushd_scraper:
         title = html.find("td",{"class" : "embedded"})
         types = html.find("img").get("title")
         full_name = title.find("a").get("title")
+        href = title.find("a").get("href")
         title.a.decompose()
         if title.b != None:
             title.b.decompose()
@@ -47,7 +49,8 @@ class nexushd_scraper:
             "time" : time,
             "size" : size,
             "upload" : upload,
-            "download" : download
+            "download" : download,
+            "href" : self.url + href
         }
 
         return content_dict
@@ -92,4 +95,23 @@ class nexushd_scraper:
 
         return soup
 
+    def login(self,username,password):
+        params = {
+            "username" : username,
+            "password" : password
+        }
+
+        r = requests.post(
+            self.url + "takelogin.php",
+            params = params,
+            cookies = self.cookie,
+            allow_redirects = False
+            )
+
+        self.cookie = requests.utils.dict_from_cookiejar(r.cookies)
+        
+        if self.cookie == None:
+            return False
+        else:
+            return True
 
