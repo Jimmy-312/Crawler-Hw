@@ -61,3 +61,34 @@ class scraper:
     
     def login(self):
         self.simple_login()
+
+    def get_raw_data(self,url,params):
+        r = requests.get(
+            url,
+            cookies = self.cookie,
+            params = params,
+            headers = {
+                "Content-Type" : "application/x-www-form-urlencoded",
+                "user-agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.74 Safari/537.36 Edg/99.0.1150.55"
+            }
+            )
+
+        content = r.content.decode("utf-8")
+        soup = BeautifulSoup(content, "html.parser")
+
+        return soup
+    
+    def search_raw(self,name):
+        torrents = []
+        page = 0
+
+        while True:
+            result = self.get_page(name,page)
+            if len(result) == 0:
+                break
+            torrents += result
+            page += 1
+            break
+        
+        return torrents
+    

@@ -1,5 +1,3 @@
-import requests
-from bs4 import BeautifulSoup
 from scraper import scraper
 
 class nexushd_scraper(scraper):
@@ -41,19 +39,6 @@ class nexushd_scraper(scraper):
         }
 
         return content_dict
-    
-    def search_raw(self,name):
-        torrents = []
-        page = 0
-
-        while True:
-            result = self.get_page(name,page)
-            if len(result) == 0:
-                break
-            torrents += result
-            page += 1
-        
-        return torrents
 
     def get_page(self,name,page):
         params={
@@ -70,17 +55,6 @@ class nexushd_scraper(scraper):
     
         return result[1:]
 
-    def get_raw_data(self,url,params):
-        r = requests.get(
-            url,
-            cookies = self.cookie,
-            params = params
-            )
 
-        content = r.content.decode("utf-8")
-        soup = BeautifulSoup(content, "html.parser")
-
-        return soup
-    
 
 
