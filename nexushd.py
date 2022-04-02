@@ -35,7 +35,8 @@ class nexushd_scraper(scraper):
             "size" : size,
             "upload" : upload,
             "download" : download,
-            "href" : self.url + href
+            "detail" : self.url + href,
+            "href" : self.url + "download.php?" + href.split("?")[-1].split("&")[0]
         }
 
         return content_dict

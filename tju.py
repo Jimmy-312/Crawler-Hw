@@ -1,22 +1,19 @@
 from scraper import scraper
 
-class byr_scraper(scraper):
+class tju_scraper(scraper):
     def __init__(self,username,password,cookie = None):
-        super(byr_scraper,self).__init__(username,password,cookie)
-        self.url = 'https://byr.pt/'
-    
-    def login(self):
-        self.login_with_img()
+        super(tju_scraper,self).__init__(username,password,cookie)
+        self.url = 'https://tjupt.org/'
     
     def process_raw_data(self,html):
-        title = html.find("td",{"class" : "embedded"})
+        embedded = html.find_all("td",{"class" : "embedded"})
         types = html.find("img").get("title")
-        full_name = title.find("a").get("title")
-        href = title.find("a").get("href")
-        title.a.decompose()
-        if title.b != None:
-            title.b.decompose()
-        description = title.get_text()
+        full_name = embedded[1].find("a").get("title")
+        href = embedded[2].find("a").get("href")
+        embedded[1].a.decompose()
+        if embedded[1].b != None:
+            embedded[1].b.decompose()
+        description = embedded[1].get_text()
 
         raw_loc = html.find("table",{"class" : "torrentname"}).parent.next_sibling.next_sibling
         time = raw_loc.find("span").get("title")
@@ -38,8 +35,8 @@ class byr_scraper(scraper):
             "size" : size,
             "upload" : upload,
             "download" : download,
-            "detail" : self.url + href,
-            "href" : self.url + "download.php?" + href.split("?")[-1].split("&")[0]
+            "href" : self.url + href,
+            "detail" : self.url + "details.php?" + href.split("?")[-1] + "&hit=1"
         }
 
         return content_dict
@@ -51,10 +48,10 @@ class byr_scraper(scraper):
             }
 
         soup = self.get_raw_data(self.url + "torrents.php",params)
-        raw = soup.find("table", {"class" : "torrents"}).find("form").contents
+        raw = soup.find("table", {"class" : "torrents"}).contents
         result = []
         for i in raw:
             if i != "\n":
                 result.append(i)
     
-        return result[2:]
+        return result[1:]
