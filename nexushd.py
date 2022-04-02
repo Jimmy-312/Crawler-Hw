@@ -1,24 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
+from scraper import scraper
 
-class nexushd_scraper:
-    def __init__(self,cookie = None):
-        self.cookie = cookie
+class nexushd_scraper(scraper):
+    def __init__(self,username,password,cookie = None):
+        super(nexushd_scraper,self).__init__(username,password,cookie)
         self.url = 'http://nexushd.org/'
-    
-    def search(self,name):
-        if self.cookie == None:
-            return None
-        raw_data = self.search_raw(name)
-        data = []
-        id = 0
-        for i in raw_data:
-            content = self.process_raw_data(i)
-            content["id"] = id
-            id += 1
-            data.append(content)
-        
-        return data
 
     def process_raw_data(self,html):
         title = html.find("td",{"class" : "embedded"})
@@ -94,24 +81,6 @@ class nexushd_scraper:
         soup = BeautifulSoup(content, "html.parser")
 
         return soup
+    
 
-    def login(self,username,password):
-        params = {
-            "username" : username,
-            "password" : password
-        }
-
-        r = requests.post(
-            self.url + "takelogin.php",
-            params = params,
-            cookies = self.cookie,
-            allow_redirects = False
-            )
-
-        self.cookie = requests.utils.dict_from_cookiejar(r.cookies)
-        
-        if self.cookie == None:
-            return False
-        else:
-            return True
 

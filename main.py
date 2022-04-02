@@ -1,3 +1,4 @@
+from byr import byr_scraper
 from nexushd import nexushd_scraper
 
 with open("user.txt","rb") as f:
@@ -7,8 +8,11 @@ with open("user.txt","rb") as f:
 
 name = "Star Wars"
 
-nexushd = nexushd_scraper()
-nexushd.login(username,password)
+# nexushd = nexushd_scraper(username,"@0312aaa")
+# nexushd.login()
 
-result = nexushd.search(name)
-print(result[0])
+# result = nexushd.search(name)
+# print(result[0])
+
+# byr = byr_scraper(username,password)
+# byr.login()
