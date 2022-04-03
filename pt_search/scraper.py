@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 class scraper:
-    def __init__(self,username,password,cookie = None):
+    def __init__(self,username = None,password = None,cookie = None):
         self.cookie = cookie
         self.url = None
         self.login_target = "takelogin.php"
@@ -11,6 +11,12 @@ class scraper:
             "username" : username,
             "password" : password,
         }
+        self.userinfo = {}
+        self.result = []
+
+    def set_user(self,username,password):
+        self.params["username"] = username
+        self.params["password"] = password
 
     def simple_login(self):
         r = requests.post(
@@ -35,15 +41,9 @@ class scraper:
         soup = BeautifulSoup(r.text,"html.parser")
 
         img = soup.find("img",{"alt" : "CAPTCHA"}).get("src")
-        imghash = img.split("=")[-1]
+        self.imghash = img.split("=")[-1]
 
-        print(self.url + img)
-        hashcode = input("Please input the hashcode: ")
-        self.params["imagestring"] = hashcode
-        self.params["imagehash"] = imghash
-
-        self.simple_login()
-
+        return self.url + "image.php?action=regimage&imagehash=" + self.imghash
     
     def search(self,name):
         if self.cookie == None:
@@ -56,6 +56,8 @@ class scraper:
             content["id"] = id
             id += 1
             data.append(content)
+        
+        self.result = data
         
         return data
     
@@ -91,4 +93,21 @@ class scraper:
             break
         
         return torrents
+    
+    def get_userinfo(self):
+        r = requests.get(
+            self.url + 'index.php',
+            cookies = self.cookie,
+            headers = {
+                "Content-Type" : "application/x-www-form-urlencoded",
+                "user-agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.74 Safari/537.36 Edg/99.0.1150.55"
+            }
+        )
+
+        soup = BeautifulSoup(r.text,"html.parser")
+        block = list(soup.find("table",{"id" : "info_block"}).stripped_strings)
+        self.process_raw_userinfo(block)
+
+    def process_raw_userinfo(self):
+        pass
     

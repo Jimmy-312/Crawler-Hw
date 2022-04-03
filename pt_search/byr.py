@@ -1,12 +1,16 @@
-from scraper import scraper
+from pt_search.scraper import scraper
 
 class byr_scraper(scraper):
-    def __init__(self,username,password,cookie = None):
+    def __init__(self,username = None,password = None,cookie = None):
         super(byr_scraper,self).__init__(username,password,cookie)
         self.url = 'https://byr.pt/'
+        self.imghash = None
     
-    def login(self):
-        self.login_with_img()
+    def login(self,captcha = None):
+        self.params["imagestring"] = captcha
+        self.params["imagehash"] = self.imghash
+
+        self.simple_login()
     
     def process_raw_data(self,html):
         title = html.find("td",{"class" : "embedded"})
@@ -58,3 +62,18 @@ class byr_scraper(scraper):
                 result.append(i)
     
         return result[2:]
+    
+    def process_raw_userinfo(self,block):
+        name = block[1]
+        credit = block[15][3:]
+        ratio = block[23]
+        upload = block[25]
+        download = block[27]
+
+        self.userinfo = {
+            "name" : name,
+            "credit" : credit,
+            "ratio" : ratio,
+            "upload" : upload,
+            "download" : download,
+        }
