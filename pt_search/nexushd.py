@@ -69,6 +69,7 @@ class nexushd_scraper(scraper):
             "ratio" : ratio,
             "upload" : upload,
             "download" : download,
+            "type" : "NexusHD"
         }
 
 

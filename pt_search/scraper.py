@@ -62,7 +62,7 @@ class scraper:
         return data
     
     def login(self):
-        self.simple_login()
+        return self.simple_login()
 
     def get_raw_data(self,url,params):
         r = requests.get(
@@ -90,7 +90,6 @@ class scraper:
                 break
             torrents += result
             page += 1
-            break
         
         return torrents
     

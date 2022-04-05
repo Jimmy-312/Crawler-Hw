@@ -10,7 +10,7 @@ class byr_scraper(scraper):
         self.params["imagestring"] = captcha
         self.params["imagehash"] = self.imghash
 
-        self.simple_login()
+        return self.simple_login()
     
     def process_raw_data(self,html):
         title = html.find("td",{"class" : "embedded"})
@@ -76,4 +76,5 @@ class byr_scraper(scraper):
             "ratio" : ratio,
             "upload" : upload,
             "download" : download,
+            "type" : "BYRPT"
         }

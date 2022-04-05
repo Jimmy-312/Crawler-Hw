@@ -67,4 +67,5 @@ class tju_scraper(scraper):
             "credit" : credit,
             "upload" : upload,
             "H&R" : hr,
+            "type" : "TJUPT"
         }

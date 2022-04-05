@@ -1,7 +1,8 @@
 from pt_search.byr import byr_scraper
 from pt_search.nexushd import nexushd_scraper
 from pt_search.tju import tju_scraper
-from flask import Flask, render_template, request
+from flask import Flask, jsonify, request
+from flask_cors import CORS
 
 # with open("user.txt","rb") as f:
 #     content = f.read().decode("utf-8")
@@ -27,47 +28,53 @@ from flask import Flask, render_template, request
 # print(res[1])
 
 app = Flask(__name__)
+CORS(app)
 
 nexushd = nexushd_scraper()
 byr = byr_scraper()
 tju = tju_scraper()
 
-@app.route("/")
+@app.route("/captcha")
 def index():
     url = byr.login_with_img()
-    print(url)
-    return render_template("index.html",url = url)
+    return url
 
 @app.route("/login",methods=["POST"])
 def login():
-    username = request.form.get("username")
-    password = request.form.get("password")
-    webtype = request.form.get("type")
+    data = request.get_json()
+    username = data["username"]
+    password = data["password"]
+    webtype = data["type"]
+    userinfo = {}
 
     if webtype == "nexushd":
         nexushd.set_user(username,password)
-        nexushd.login()
+        if not nexushd.login():
+            return "fail"
         nexushd.get_userinfo()  
-        print(nexushd.userinfo)
+        userinfo = nexushd.userinfo
     elif webtype == "byr":
         captcha = request.form.get("captcha")
         byr.set_user(username,password)
-        byr.login(captcha)
+        if not byr.login(captcha):
+            return "fail"
         byr.get_userinfo()
-        print(byr.userinfo)
+        userinfo = byr.userinfo
     elif webtype == "tju":
         tju.set_user(username,password)
-        tju.login()
+        if not tju.login():
+            return "fail"
         tju.get_userinfo()
-        print(tju.userinfo)
+        userinfo = tju.userinfo
 
-    return render_template("index.html")
+    return userinfo
 
 @app.route("/search")
 def search():
     name = request.args.get("name")
-    print(name)  
-    return render_template("index.html")
+    nexushd.search(name) 
+    print(nexushd.result)
+    return jsonify(nexushd.result)
 
 if __name__ == '__main__':
     app.debug = True
