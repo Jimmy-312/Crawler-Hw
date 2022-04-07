@@ -8,6 +8,9 @@ class tju_scraper(scraper):
     def process_raw_data(self,html):
         embedded = html.find_all("td",{"class" : "embedded"})
         types = html.find("img").get("title")
+        css_type = html.find("img").get("class")[0]
+        if css_type not in self.type_list:
+            css_type = 'c_other'
         full_name = embedded[1].find("a").get("title")
         href = embedded[2].find("a").get("href")
         embedded[1].a.decompose()
@@ -28,6 +31,8 @@ class tju_scraper(scraper):
         download = raw_loc.text
 
         content_dict = {
+            "source" : "TJUPT",
+            "csstype" : css_type,
             "type" : types,
             "name" : full_name,
             "description" : description,
@@ -63,9 +68,9 @@ class tju_scraper(scraper):
         upload = block[33]
 
         self.userinfo = {
-            "name" : name,
-            "credit" : credit,
-            "upload" : upload,
+            "Name" : name,
+            "Credit" : credit,
+            "Upload" : upload,
             "H&R" : hr,
-            "type" : "TJUPT"
+            "Type" : "TJUPT"
         }

@@ -5,6 +5,7 @@ class scraper:
     def __init__(self,username = None,password = None,cookie = None):
         self.cookie = cookie
         self.url = None
+        self.is_login = False
         self.login_target = "takelogin.php"
         self.login_home = "login.php"
         self.params = {
@@ -13,6 +14,7 @@ class scraper:
         }
         self.userinfo = {}
         self.result = []
+        self.type_list = ['c_anime','c_doc','c_elearning','c_games','c_hqaudio','c_movies','c_mv','c_sports','c_tvseries']
 
     def set_user(self,username,password):
         self.params["username"] = username
@@ -34,7 +36,13 @@ class scraper:
         if self.cookie == None:
             return False
         else:
-            return True
+            try:
+                self.get_userinfo()
+                self.is_login = True
+                return True
+            except:
+                return False
+            
     
     def login_with_img(self):
         r = requests.get(self.url + self.login_home)
@@ -49,6 +57,8 @@ class scraper:
         if self.cookie == None:
             return None
         raw_data = self.search_raw(name)
+        if raw_data == None:
+            return []
         data = []
         id = 0
         for i in raw_data:
@@ -61,7 +71,7 @@ class scraper:
         
         return data
     
-    def login(self):
+    def login(self,captcha = None):
         return self.simple_login()
 
     def get_raw_data(self,url,params):
@@ -85,11 +95,15 @@ class scraper:
         page = 0
 
         while True:
-            result = self.get_page(name,page)
-            if len(result) == 0:
-                break
-            torrents += result
-            page += 1
+            try:
+                result = self.get_page(name,page)
+                if len(result) == 0:
+                    break
+                torrents += result
+                page += 1
+            except:
+                return None
+            
         
         return torrents
     
@@ -110,3 +124,5 @@ class scraper:
     def process_raw_userinfo(self):
         pass
     
+    def logout(self):
+        self.is_login = False

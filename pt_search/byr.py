@@ -15,6 +15,9 @@ class byr_scraper(scraper):
     def process_raw_data(self,html):
         title = html.find("td",{"class" : "embedded"})
         types = html.find("img").get("title")
+        css_type = html.find("img").get("class")[0]
+        if css_type not in self.type_list:
+            css_type = 'c_other'
         full_name = title.find("a").get("title")
         href = title.find("a").get("href")
         title.a.decompose()
@@ -35,6 +38,8 @@ class byr_scraper(scraper):
         download = raw_loc.text
 
         content_dict = {
+            "source" : "BYRPT",
+            "csstype" : css_type,
             "type" : types,
             "name" : full_name,
             "description" : description,
@@ -71,10 +76,10 @@ class byr_scraper(scraper):
         download = block[27]
 
         self.userinfo = {
-            "name" : name,
-            "credit" : credit,
-            "ratio" : ratio,
-            "upload" : upload,
-            "download" : download,
-            "type" : "BYRPT"
+            "Name" : name,
+            "Credit" : credit,
+            "Ratio" : ratio,
+            "Upload" : upload,
+            "Download" : download,
+            "Type" : "BYRPT"
         }
